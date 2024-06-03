@@ -8,19 +8,11 @@ use Illuminate\Http\Request;
 abstract class QueryFilter{
     protected $builder;
     protected $request;
+    protected $sortable=[];
     public function __construct(Request $request){
         $this->request = $request;
-    }
 
-    protected function filter($arr){
-        foreach($arr as $key=>$value){
-            if(method_exists($this, $key)){
-                $this->$key($value);
-            }
-        }
-        return $this->builder;
     }
-
     public function apply(Builder $builder){
         $this->builder = $builder;
 
@@ -30,6 +22,32 @@ abstract class QueryFilter{
             }
         }
         return $builder;
+    }
+    protected function filter($arr){
+        foreach($arr as $key=>$value){
+            if(method_exists($this, $key)){
+                $this->$key($value);
+            }
+        }
+        return $this->builder;
+    }
+    protected function sort($value){
+        $sortAttributes= explode(",", $value);
+        foreach($sortAttributes as $attribute){
+            $direction='asc';
+            if(strpos($attribute,'-') === 0){
+                $direction= 'desc';
+                $attribute= substr($attribute,1);
+            }
+            if(!in_array($attribute, $this->sortable) && !array_key_exists($attribute, $this->sortable)){
+                continue;
+            }
+            $columnName=$this->sortable[$attribute]??null;
+            if($columnName===null){
+                $columnName=$attribute;
+            }
+            $this->builder->orderBy($columnName, $direction);
+        }
     }
 
 
