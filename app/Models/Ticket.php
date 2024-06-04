@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Model;
 class Ticket extends Model
 {
     use HasFactory;
-
-    public function author(){
-        return $this->belongsTo(User::class,'user_id');
+    protected $fillable = ['title', 'status', 'description', 'user_id',];
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function scopeFilter(Builder $builder, QueryFilter $filters){
+    public function scopeFilter(Builder $builder, QueryFilter $filters)
+    {
         return $filters->apply($builder);
     }
 }

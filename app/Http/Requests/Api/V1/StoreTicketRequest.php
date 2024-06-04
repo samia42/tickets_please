@@ -9,9 +9,9 @@ class StoreTicketRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function authorize() : bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -19,10 +19,22 @@ class StoreTicketRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules() : array
+    {
+        $rules = [
+            "data.attributes.title" => "required|string",
+            "data.attributes.description" => "required|string",
+            "data.attributes.status" => "required|string|in:A,X,C,H",
+        ];
+        if ($this->routeIs('tickets.store')) {
+            $rules['data.relationships.author.data.id'] .= "required|integer";
+        }
+        return $rules;
+    }
+    public function messages() : array
     {
         return [
-            //
+            "data.attributes.status" => "The selected data.attributes.status is invalid.Please Use A, C, H, X",
         ];
     }
 }

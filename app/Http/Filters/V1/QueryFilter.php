@@ -11,7 +11,6 @@ abstract class QueryFilter{
     protected $sortable=[];
     public function __construct(Request $request){
         $this->request = $request;
-
     }
     public function apply(Builder $builder){
         $this->builder = $builder;
