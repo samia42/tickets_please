@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Api\V1;
 
-use Faker\Provider\Base;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateTicketRequest extends BaseTicketRequest
+class ReplaceTicketRequest extends BaseTicketRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +23,12 @@ class UpdateTicketRequest extends BaseTicketRequest
     {
 
         $rules = [
-            'data.attributes.title' => 'sometimes|string',
-            'data.attributes.description' => 'sometimes|string',
-            'data.attributes.status' => 'sometimes|string|in:A,C,H,X',
+            'data.attributes.title' => 'required|string',
+            'data.attributes.description' => 'required|string',
+            'data.attributes.status' => 'required|string|in:A,C,H,X',
         ];
         if (is_null($this->route()->parameter('author'))) {
-            $rules['data.relationships.author.data.id'] = 'sometimes|integer';
+            $rules['data.relationships.author.data.id'] = 'required|integer';
         }
         return $rules;
     }

@@ -2,14 +2,19 @@
 
 namespace App\Providers;
 
+use App\Models\Ticket;
+use App\Policies\V1\TicketPolicy;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+
+
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    public function register(): void
+    public function register() : void
     {
         //
     }
@@ -17,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot() : void
     {
-        //
+
     }
 }
