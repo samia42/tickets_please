@@ -22,10 +22,17 @@ class AuthorTicketsController extends ApiController
         return TicketResource::collection(
             Ticket::where('user_id', $author_id)->filter($filters)->paginate());
     }
-    public function store($author_id, StoreTicketRequest $request)
+    public function store(StoreTicketRequest $request, $author_id)
     {
+        try {
+            Gate::authorize('store', Ticket::class);
+            return new TicketResource(Ticket::create($request->mappedAttributes([
+                'author' => 'user_id'
+            ])));
 
-        return Ticket::create($request->mappedAttributes());
+        } catch (AuthorizationException $e) {
+            return $this->error('You are not authorized to create a ticket', 403);
+        }
     }
 
     /**
@@ -35,16 +42,19 @@ class AuthorTicketsController extends ApiController
     {
         //PUT
         try {
-            $ticket = Ticket::findOrFail($ticket_id);
-            if ($ticket->user_id == $author_id) {
-                $ticket->update($request->mappedAttributes());
-                return new TicketResource($ticket);
-            }
-            //Todo:Ticket doesnot belong to author
 
+            $ticket = Ticket::
+                where('id', $ticket_id)
+                ->where('user_id', $author_id)
+                ->firstOrFail();
+            Gate::authorize('replace', $ticket);
+            $ticket->update($request->mappedAttributes());
+            return new TicketResource($ticket);
 
         } catch (ModelNotFoundException $e) {
             return $this->error('Ticket not found', 404);
+        } catch (AuthorizationException $e) {
+            return $this->error('You are not authorized to replace a ticket', 403);
         }
 
 
@@ -53,17 +63,15 @@ class AuthorTicketsController extends ApiController
     {
         //PUT
         try {
-            $ticket = Ticket::findOrFail($ticket_id);
-            //policy
+            $ticket = Ticket::
+                where('id', $ticket_id)
+                ->where('user_id', $author_id)
+                ->firstOrFail();
             Gate::authorize('update', $ticket);
-            if ($ticket->user_id == $author_id) {
 
-                $ticket->update($request->mappedAttributes());
-                return new TicketResource($ticket);
-            }
-            //Todo:Ticket doesnot belong to author
+            $ticket->update($request->mappedAttributes());
 
-
+            return new TicketResource($ticket);
         } catch (ModelNotFoundException $e) {
             return $this->error('Ticket not found', 404);
         } catch (AuthorizationException $e) {
@@ -79,14 +87,20 @@ class AuthorTicketsController extends ApiController
     public function destroy($author_id, $ticket_id)
     {
         try {
-            $ticket = Ticket::findOrFail($ticket_id);
-            if ($ticket->user_id != $author_id) {
-                return $this->error('Ticket not found', 404);
-            }
+            $ticket = Ticket::
+                where('id', $ticket_id)
+                ->where('user_id', $author_id)
+                ->firstOrFail();
+
+            Gate::authorize('update', $ticket);
+
             $ticket->delete();
+
             return $this->ok('ticket deleted', []);
         } catch (ModelNotFoundException $e) {
             return $this->error('Ticket not found', 404);
+        } catch (AuthorizationException $e) {
+            return $this->error('You are not authorized to delete this ticket', 403);
         }
     }
 }
