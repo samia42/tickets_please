@@ -14,7 +14,7 @@ final class Abilities
 
     public const CreateUser = 'user.create';
     public const UpdateUser = 'user.update';
-    public const ReplacUser = 'user.replace';
+    public const ReplaceUser = 'user.replace';
     public const DeleteUser = 'user.delete';
 
     public static function getAbilities($user)
@@ -29,7 +29,7 @@ final class Abilities
                 self::DeleteOwnTicket,
                 self::CreateUser,
                 self::UpdateUser,
-                self::ReplacUser,
+                self::ReplaceUser,
                 self::DeleteUser,
             ];
         } else {

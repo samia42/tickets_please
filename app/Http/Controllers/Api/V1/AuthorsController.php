@@ -16,7 +16,11 @@ class AuthorsController extends ApiController
      */
     public function index(AuthorFilter $filter)
     {
-        return UserResource::collection(User::filter($filter)->paginate());
+        return UserResource::collection(User::select('users.*')
+            ->join('tickets', 'users.id', '=', 'tickets.user_id')
+            ->filter($filter)
+            ->distinct()
+            ->paginate());
     }
 
     /**
@@ -32,9 +36,9 @@ class AuthorsController extends ApiController
      */
     public function show(User $author)
     {
-        if($this->include('tickets')){
+        if ($this->include('tickets')) {
             return new UserResource($author->load('tickets'));
-       }
+        }
         return new UserResource($author);
     }
 

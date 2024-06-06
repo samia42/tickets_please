@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreUserRequest extends BaseUserRequest
+class ReplaceUserRequest extends BaseUserRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,6 +29,5 @@ class StoreUserRequest extends BaseUserRequest
             'data.attributes.password' => 'required|string',
         ];
         return $rules;
-
     }
 }
